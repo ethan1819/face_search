@@ -1,4 +1,4 @@
-# 在其他电脑上传本项目到 GitHub
+﻿# 在其他电脑上传本项目到 GitHub
 
 本项目当前在 `E:\AI\workspace\local-face-photo-search`，已完成首次 git commit（hash `9803826`，尚未 push 到任何远程）。本说明文档给"在另一台电脑上用 Hermes（或任何 AI agent）帮你把仓库上传到 GitHub"使用。
 
@@ -121,7 +121,7 @@ start.bat
 2. **Chinese path 可能 OpenCV 读不下**：本项目用 `np.fromfile + cv2.imdecode` 兜底，不影响。
 3. **模型首次启动慢**：CPU 模式 1-2 秒/张，GPU 模式 0.1-0.3 秒/张。库大时耐心等。
 4. **商业授权**：InsightFace 开源协议是 MIT，但官方预训练模型仅限非商业研究使用。商业上线前必须替换或取得授权。已在 `README.md` 第 6 段强调。
-5. **图片读不到**：`尹成毅\` 是默认图库，对方可能不在 M 盘，必须在程序里"选择图库"按钮重新指定。
+5. **图片读不到**：默认图库为空，对方必须在程序里点「选择图库」指定图库目录。
 6. **HEIC 暂不支持**：iPhone 新格式；未来加 pillow-heif 即可。
 7. **磁盘空间**：.venv 装好约 1.5GB（cp312 + onnxruntime + insightface + pyside6 + 模型额外 300MB）。如果是小硬盘机器，预先计划好。
 
@@ -135,7 +135,7 @@ start.bat
 - [ ] 另一台电脑 `git clone` 能成功
 - [ ] `python -m pytest` 全部 43 项通过
 - [ ] `start.bat` 双击能看到 PySide6 窗口
-- [ ] 默认图库加载 `尹成毅\`（2890 张）能正常扫描
+- [ ] 默认空图库（点击「选择图库」指定目录后能正常扫描）
 
 ---
 

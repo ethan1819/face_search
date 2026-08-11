@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import hashlib
 import logging
@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 DB_PATH = DATA / "index.db"
 CACHE = DATA / "thumbnails"
-DEFAULT_LIBRARY = r"尹成毅\"
+DEFAULT_LIBRARY = ""  # empty: UI asks the user to pick a library on first run
 
 
 def setup_logging() -> None:
