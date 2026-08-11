@@ -1,4 +1,4 @@
-# 本地人脸照片检索 / Local Face Photo Search
+﻿# 本地人脸照片检索 / Local Face Photo Search
 
 > 100% 本地运行 · 不上传原图 · 人脸余弦相似度检索 · PySide6 桌面程序
 >
@@ -21,7 +21,7 @@ app scans your local photo library. Photos are ranked by the **maximum face cosi
 similarity** against your target embedding. **Source photos are read-only — nothing
 is uploaded, modified, or deleted.**
 
-![screenshot placeholder — drop a screenshot/GIF here](docs/screenshot.png)
+![screenshot of the local face photo search app — main window with reference photo picker on the left, threshold sliders, scan / search controls, and empty results table on the right; the app is fully local and never uploads photos](docs/screenshot.png)
 
 ## 特性 / Features
 
@@ -135,6 +135,13 @@ authorization. After a model swap, rebuild the index using `model_name` keys.
 - [ ] 自动阈值校准工具
 - [ ] 模型迁移脚本（buffalo_l → 商用模型）
 - [ ] Linux 打包（PyInstaller / AppImage）
+
+## 社区 / Community
+
+- 🤝 [Code of Conduct](CODE_OF_CONDUCT.md) — Contributor Covenant v2.1
+- 🔒 [Security Policy](SECURITY.md) — how to report vulnerabilities privately
+- 🐛 [Issue templates](.github/ISSUE_TEMPLATE/) — bug report + feature request
+- 📥 [CONTRIBUTING.md](CONTRIBUTING.md) — dev setup, running tests, PR checklist
 
 ## 致谢 / Acknowledgments
 
