@@ -62,7 +62,7 @@ uv pip install --python .venv\Scripts\python.exe "onnxruntime-gpu>=1.18,<2"
 
 ## 使用 / Usage
 
-1. 双击 `start.bat`，默认图库 `M:\1A 尹成毅\724大会资料`（可在 UI 里「选择图库」改）
+1. 双击 `start.bat`，默认图库 `D:\photos`（可在 UI 里「选择图库」改）
 2. 点「**选择参考照片**」→ 检测到多张脸时点选目标人物
 3. 点「**扫描/增量索引**」→ 后台 QThread 执行，可随时取消
 4. 点「**搜索**」→ 结果分**高置信 (≥0.55)** 和**人工确认 (0.35–0.55)**
