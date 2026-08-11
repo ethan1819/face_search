@@ -55,9 +55,19 @@ jobs:
       - name: Create venv
         run: uv venv --python ${{ matrix.python-version }} .venv
 
-      - name: Install dependencies
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: uv pip install --python .venv/bin/python -r requirements.txt pytest pytest-cov
 
-      - name: Run tests
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: uv pip install --python .venv/Scripts/python.exe -r requirements.txt pytest pytest-cov
+
+      - name: Run tests (Linux)
+        if: runner.os == 'Linux'
         run: .venv/bin/python -m pytest -q
-        shell: bash
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        run: .venv/Scripts/python.exe -m pytest -q
+        shell: pwsh
