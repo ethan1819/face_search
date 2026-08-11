@@ -1,8 +1,30 @@
-[project]
+﻿[project]
 name = "local-face-photo-search"
 version = "0.1.0"
-description = "完全本地运行的人脸照片检索系统"
+description = "100% 本地运行的人脸照片检索桌面程序（PySide6 + InsightFace）"
+readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.11,<3.13"
+keywords = ["face-recognition", "photo-search", "insightface", "pyside6", "local-only", "privacy"]
+authors = [
+  { name = "纯简科技", email = "aze@local" },
+]
+maintainers = [
+  { name = "aze" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: X11 Applications",
+  "Environment :: Win32 (MS Windows)",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Multimedia :: Graphics :: Viewers",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+]
 dependencies = [
   "numpy>=1.26,<3",
   "opencv-python>=4.10,<4.11",
@@ -23,6 +45,12 @@ gpu = [
 ]
 gui = ["pyside6>=6.7,<7"]
 dev = ["pytest>=8,<10", "pytest-cov>=5,<8"]
+
+[project.urls]
+Homepage = "https://github.com/ethan1819/face_search"
+Repository = "https://github.com/ethan1819/face_search"
+Issues = "https://github.com/ethan1819/face_search/issues"
+Changelog = "https://github.com/ethan1819/face_search/blob/main/CHANGELOG.md"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
