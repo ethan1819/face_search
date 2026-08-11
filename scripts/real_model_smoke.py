@@ -1,4 +1,4 @@
-﻿"""Real-model smoke test for the face engine.
+"""Real-model smoke test for the face engine.
 
 Run after the dev environment is installed:
 

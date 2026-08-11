@@ -1,4 +1,4 @@
-﻿---
+---
 name: Bug report
 about: Something broke or gave a wrong result.
 title: "[bug] "

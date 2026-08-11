@@ -1,4 +1,4 @@
-﻿# 本地人脸照片检索 / Local Face Photo Search
+# 本地人脸照片检索 / Local Face Photo Search
 
 > 100% 本地运行 · 不上传原图 · 人脸余弦相似度检索 · PySide6 桌面程序
 >

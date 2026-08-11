@@ -1,4 +1,4 @@
-﻿[project]
+[project]
 name = "local-face-photo-search"
 version = "0.1.0"
 description = "100% 本地运行的人脸照片检索桌面程序（PySide6 + InsightFace）"

@@ -1,4 +1,4 @@
-﻿# 在其他电脑上传本项目到 GitHub
+# 在其他电脑上传本项目到 GitHub
 
 本项目当前在 `E:\AI\workspace\local-face-photo-search`，已完成首次 git commit（hash `9803826`，尚未 push 到任何远程）。本说明文档给"在另一台电脑上用 Hermes（或任何 AI agent）帮你把仓库上传到 GitHub"使用。
 

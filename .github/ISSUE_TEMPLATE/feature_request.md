@@ -1,4 +1,4 @@
-﻿---
+---
 name: Feature request
 about: Suggest an idea for local-face-photo-search.
 title: "[feat] "

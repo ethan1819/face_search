@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 DB_PATH = DATA / "index.db"
 CACHE = DATA / "thumbnails"
-DEFAULT_LIBRARY = ""  # empty: UI asks the user to pick a library on first run
+DEFAULT_LIBRARY = str(Path.home() / "Pictures")  # cross-platform default; change in the UI via "选择图库"
 
 
 def setup_logging() -> None:

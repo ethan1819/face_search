@@ -1,4 +1,4 @@
-﻿# Contributing
+# Contributing
 
 Thanks for considering a contribution. The project keeps the bar low on purpose
 so it stays approachable for individual developers who want a private face-photo
