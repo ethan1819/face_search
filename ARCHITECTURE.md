@@ -1,64 +1,87 @@
-# 本地人脸照片检索系统：技术架构
+# 本地人脸照片检索系统：技术架构 / Local Face Photo Search — Architecture
 
-## 1. MVP 边界
+> 中英双语版 · Bilingual edition
+>
+> 中文在前，English follows. 同一节内，左栏（中文）/右栏（English）的语义一一对应。
 
-第一阶段只验证一条端到端链路：一张参考照片 → 检测全部人脸 → 选定目标脸 → 扫描一个照片文件夹 → 每张照片检测全部人脸 → 以该照片最高余弦相似度排序并返回整张照片。
+---
+
+## 1. MVP 边界 / MVP Scope
+
+**中文**：第一阶段只验证一条端到端链路——一张参考照片 → 检测全部人脸 → 选定目标脸 → 扫描一个照片文件夹 → 每张照片检测全部人脸 → 以该照片最高余弦相似度排序并返回整张照片。
 
 MVP 不提前实现：HEIC、ANN 向量索引、安装包、多库管理、复杂权限。SQLite 索引和 PySide6 UI 在核心链路验证后逐步加入。
 
-## 2. 技术选型
+**English**: Phase 1 validates exactly one end-to-end chain: a reference photo → detect all faces → pick the target face → scan one photo folder → detect all faces per photo → rank photos by their **maximum cosine similarity** to the target embedding → return the whole photo.
 
-- Python 3.11：兼容 PySide6、ONNX Runtime、OpenCV，当前 Windows 主机已安装。
-- PySide6：Windows 原生桌面 GUI；`QThreadPool + QRunnable` 或专用 `QThread` 执行扫描，主线程只更新 UI。
-- InsightFace `FaceAnalysis`：统一做人脸检测、关键点、对齐和 512 维特征提取。
-- ONNX Runtime：默认 `CPUExecutionProvider`；检测到可用 CUDA 时优先 `CUDAExecutionProvider`，失败自动降级 CPU。
-- OpenCV + Pillow：图像处理；Windows 中文路径优先 Pillow/`np.fromfile + cv2.imdecode`，避免 `cv2.imread` 中文路径问题。
-- SQLite：WAL 模式；照片、脸、扫描失败、用户确认记录分表保存。
-- NumPy：特征向量 L2 归一化和余弦相似度批量计算。
-- pytest：单元、数据库、增量扫描与集成测试。
-- structlog/标准 logging：滚动日志和失败文件记录。
-- PyInstaller：Windows 第一版打包；模型作为外部目录，不塞进单文件 exe。
+Explicitly **out of scope** for MVP: HEIC, ANN vector index, installers, multi-library management, complex permissions. SQLite indexing and the PySide6 UI are layered on after the core chain works.
 
-## 3. 分层架构
+---
 
-```text
+## 2. 技术选型 / Tech choices
+
+- **Python 3.11** — 兼容 PySide6、ONNX Runtime、OpenCV，当前 Windows 主机已安装。
+- **PySide6** — Windows 原生桌面 GUI；`QThreadPool + QRunnable` 或专用 `QThread` 执行扫描，主线程只更新 UI。
+- **InsightFace `FaceAnalysis`** — 统一做人脸检测、关键点、对齐和 512 维特征提取。
+- **ONNX Runtime** — 默认 `CPUExecutionProvider`；检测到可用 CUDA 时优先 `CUDAExecutionProvider`，失败自动降级 CPU。
+- **OpenCV + Pillow** — 图像处理；Windows 中文路径优先 Pillow/`np.fromfile + cv2.imdecode`，避免 `cv2.imread` 中文路径问题。
+- **SQLite** — WAL 模式；照片、脸、扫描失败、用户确认记录分表保存。
+- **NumPy** — 特征向量 L2 归一化和余弦相似度批量计算。
+- **pytest** — 单元、数据库、增量扫描与集成测试。
+- **structlog / 标准 logging** — 滚动日志和失败文件记录。
+- **PyInstaller** — Windows 第一版打包；模型作为外部目录，不塞进单文件 exe。
+
+**English summary**: Python 3.11 / PySide6 / InsightFace / ONNX Runtime (CPU + optional CUDA) / OpenCV + Pillow (with Chinese-path safe IO) / SQLite WAL / NumPy / pytest / PyInstaller.
+
+---
+
+## 3. 分层架构 / Layered architecture
+
+```
 PySide6 UI
-  ├─ 参考图与人脸选择
-  ├─ 照片库/扫描进度
-  └─ 搜索结果、确认、排除、复制
+  ├─ 参考图与人脸选择    Reference photo + face picker
+  ├─ 照片库/扫描进度    Library + scan progress
+  └─ 搜索结果、确认、排除、复制   Results, confirm, exclude, copy
           ↓ signals/slots
-后台 Workers
-  ├─ ScanWorker（枚举、增量判断、检测、入库）
-  ├─ SearchWorker（目标特征与索引批量比对）
-  └─ ThumbnailWorker（异步缩略图）
+后台 Workers  (Background workers)
+  ├─ ScanWorker      枚举、增量判断、检测、入库   Enumerate, incrementality, detect, store
+  ├─ SearchWorker    目标特征与索引批量比对       Batch compare target vs index
+  └─ ThumbnailWorker 异步缩略图                    Async thumbnails
           ↓
-核心服务
-  ├─ FaceEngine（InsightFace/ORT provider 封装）
-  ├─ LibraryScanner（损坏隔离、断点续扫）
-  ├─ SearchService（每张照片 max(face scores)）
-  └─ ExportService（只复制，不修改源照片）
+核心服务     (Core services)
+  ├─ FaceEngine      InsightFace / ORT provider 封装
+  ├─ LibraryScanner  损坏隔离、断点续扫            Isolates bad files, resumable
+  ├─ SearchService   每张照片 max(face scores)
+  └─ ExportService   只复制，不修改源照片           Copy only, never modifies sources
           ↓
 SQLite Repository + 本地文件系统（源照片只读）
+SQLite repo + local FS (source photos read-only)
 ```
 
-FaceEngine 必须作为接口注入，业务测试使用假引擎，模型集成测试才加载真实 InsightFace，避免每个测试下载/加载大模型。
+`FaceEngine` 必须作为接口注入；业务测试使用假引擎，模型集成测试才加载真实 InsightFace，避免每个测试下载/加载大模型。
 
-## 4. 数据库设计
+**English**: `FaceEngine` is injected via an interface so business tests use a fake engine; only the model integration tests load the real InsightFace, avoiding model downloads on every test run.
+
+---
+
+## 4. 数据库设计 / Database design
 
 ### `libraries`
-- `id`, `root_path`（唯一）, `created_at`, `last_scan_at`
+- `id`, `root_path` (unique), `created_at`, `last_scan_at`
 
 ### `photos`
-- `id`, `library_id`, `path`（唯一）, `size`, `mtime_ns`, `content_hash`（可选延迟计算）
+- `id`, `library_id`, `path` (unique), `size`, `mtime_ns`, `content_hash` (optional, lazily computed)
 - `width`, `height`, `face_count`, `scan_status`, `error_message`
 - `indexed_at`, `updated_at`
 
 增量键第一版使用 `(path, size, mtime_ns)`；相同则跳过，变化则事务内删除旧 faces 后重建。扫描结束后，可将本次未见到的记录标为 `missing`，不触碰原文件。
 
+**English**: incremental key = `(path, size, mtime_ns)`. Skip when unchanged; on change, delete old `faces` and re-extract within one transaction. After a scan, mark records not seen this round as `missing` without touching the originals.
+
 ### `faces`
 - `id`, `photo_id`, `face_index`
 - `bbox_x1/y1/x2/y2`, `det_score`
-- `embedding BLOB`（float32、512 维、L2 归一化）
+- `embedding BLOB` (float32, 512-dim, L2-normalized)
 - `embedding_dim`, `model_name`, `model_version`
 
 索引：`photo_id`；每张照片允许 0..N 张脸。
@@ -67,9 +90,11 @@ FaceEngine 必须作为接口注入，业务测试使用假引擎，模型集成
 - `id`, `photo_path`, `stage`, `exception_type`, `message`, `occurred_at`, `resolved_at`
 
 ### `search_feedback`
-- `id`, `query_id`, `photo_id`, `decision`（confirmed/excluded）, `score`, `created_at`
+- `id`, `query_id`, `photo_id`, `decision` (confirmed/excluded), `score`, `created_at`
 
-## 5. 搜索与阈值
+---
+
+## 5. 搜索与阈值 / Search & thresholds
 
 1. 参考图检测所有脸；0 张则提示换图，1 张自动选，多张显示人脸裁剪供用户选择。
 2. 目标 embedding 归一化。
@@ -81,7 +106,11 @@ FaceEngine 必须作为接口注入，业务测试使用假引擎，模型集成
    - 不返回：`score < 0.35`
 6. UI 允许调整阈值；确认/排除记录不修改源图。
 
-## 6. 性能设计
+**English**: Reference face(s) → normalized target embedding → batched dot-product against all stored embeddings → aggregate by `photo_id` keeping the max. The defaults (0.55 / 0.35) are starting points; **calibrate with your own photos**. The UI lets the user move the sliders.
+
+---
+
+## 6. 性能设计 / Performance
 
 - 一万到数万照片：SQLite 全量 embedding 分批向量化足够作为第一版，不急用 FAISS。
 - 每脸 512×4 = 2048 字节；10 万张脸约 195 MiB 原始向量，SQLite 可承受。
@@ -89,9 +118,13 @@ FaceEngine 必须作为接口注入，业务测试使用假引擎，模型集成
 - 数据库写入按照片事务提交；进程崩溃最多损失当前照片。
 - WAL、`busy_timeout`、批量 insert；UI 线程不持有扫描连接。
 - 缩略图进入独立缓存目录，按路径/mtime 生成 key；不修改原图。
-- 数十万脸后再引入 FAISS/HNSW，并以 SQLite 为真源、向量索引为可重建缓存。
+- 数十万脸后再引入 FAISS / HNSW，并以 SQLite 为真源、向量索引为可重建缓存。
 
-## 7. 稳定性与隐私
+**English**: 10k–100k photos: SQLite-only is enough. Per-face storage is 2 KB; 100k faces ≈ 195 MiB raw vectors, fine in SQLite. Single model session + background worker; GPU can batch-infer, CPU prioritises stability. Per-photo transaction commits; crash loses at most the in-flight photo. Only introduce FAISS/HNSW at hundreds of thousands of faces; SQLite remains the source of truth.
+
+---
+
+## 7. 稳定性与隐私 / Stability & privacy
 
 - 全离线推理，默认禁止任何照片上传；首次模型下载可通过安装阶段完成，运行阶段离线。
 - 每张照片独立 try/except，损坏文件记入 `scan_failures` 后继续。
@@ -100,7 +133,11 @@ FaceEngine 必须作为接口注入，业务测试使用假引擎，模型集成
 - 日志滚动保存到 `data/logs/app.log`，失败清单可导出 CSV。
 - SQLite 定期备份；schema 使用迁移版本。
 
-## 8. 模型授权风险
+**English**: 100% offline inference; no photo upload. Per-photo try/except so a corrupt file lands in `scan_failures` and scanning continues. Source photos are opened read-only; copying writes only to the destination with safe-name suffixes on collision. Cancellation is checked between photos. Rotating logs in `data/logs/app.log`; failure list is CSV-exportable. SQLite is backed up periodically; schema changes go through versioned migrations.
+
+---
+
+## 8. 模型授权风险 / Model licensing
 
 InsightFace 源代码为 MIT，但其官方自动下载的预训练模型包通常限定非商业研究用途。MVP 可用于本地技术验证；商业交付前必须：
 
@@ -108,15 +145,19 @@ InsightFace 源代码为 MIT，但其官方自动下载的预训练模型包通�
 2. 替换为明确允许商业使用的检测/识别 ONNX 模型；或
 3. 使用具备合法来源的数据自行训练并保留授权证据。
 
-因此模型层不得与业务层耦合，数据库中必须记录 `model_name/model_version`，换模型后应重建特征索引。
+因此模型层不得与业务层耦合，数据库中必须记录 `model_name / model_version`，换模型后应重建特征索引。
 
-## 9. 八阶段交付顺序
+**English**: InsightFace source is MIT, but the auto-downloaded pre-trained weights are restricted to **non-commercial research**. For commercial deployment you must: (a) obtain a commercial model license; (b) swap in a commercially-licensed ONNX detector/recogniser; or (c) train your own with documented authorisation. The model layer is kept decoupled from the business layer; `model_name` and `model_version` are stored on every face row so you can rebuild the index after a model swap.
 
-1. 架构、依赖、授权边界（本文件）。
-2. 最小检测/特征提取 CLI 和真实模型冒烟测试。
-3. 文件夹扫描、SQLite schema、全脸入库、损坏隔离。
-4. 参考脸选择模型与按照片最大值搜索。
-5. PySide6 主界面、后台 worker、进度与取消。
-6. 缩略图、打开原图/文件夹、确认/排除、复制结果。
-7. 增量扫描、断点恢复、批量计算、日志、阈值校准。
-8. 单元/集成/UI 测试、中文 README、CPU/CUDA 安装脚本、PyInstaller 打包。
+---
+
+## 9. 八阶段交付顺序 / 8-phase delivery plan
+
+1. 架构、依赖、授权边界（本文件）。 — Architecture, deps, licensing boundaries (this doc).
+2. 最小检测/特征提取 CLI 和真实模型冒烟测试。 — Minimal detection / embedding CLI + real-model smoke.
+3. 文件夹扫描、SQLite schema、全脸入库、损坏隔离。 — Folder scan, SQLite schema, all-faces ingest, bad-file isolation.
+4. 参考脸选择模型与按照片最大值搜索。 — Reference face picker + per-photo max search.
+5. PySide6 主界面、后台 worker、进度与取消。 — PySide6 main window, background workers, progress & cancel.
+6. 缩略图、打开原图/文件夹、确认/排除、复制结果。 — Thumbnails, open-original / open-folder, confirm / exclude / copy.
+7. 增量扫描、断点恢复、批量计算、日志、阈值校准。 — Incremental scan, resume, batched compute, logs, threshold calibration.
+8. 单元/集成/UI 测试、中文 README、CPU/CUDA 安装脚本、PyInstaller 打包。 — Unit / integration / UI tests, README, CPU/CUDA install scripts, PyInstaller packaging.

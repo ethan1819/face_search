@@ -1,4 +1,4 @@
-﻿# 本地人脸照片检索 / Local Face Photo Search
+# 本地人脸照片检索 / Local Face Photo Search
 
 > 100% 本地运行 · 不上传原图 · 人脸余弦相似度检索 · PySide6 桌面程序
 >
@@ -8,6 +8,13 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](pyproject.toml)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#)
 [![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blueviolet.svg)](.github/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-43%20passed-success.svg)](#verification)
+
+**其他语言 / Other languages**: [English (README)](docs/en/README.md) · [English (Architecture)](docs/en/ARCHITECTURE.md) · [中文（架构 / Architecture bilingual）](ARCHITECTURE.md)
+
+---
+
+
 [![Tests](https://img.shields.io/badge/tests-43%20passed-success.svg)](#verification)
 
 ## 这是什么 / What is this
