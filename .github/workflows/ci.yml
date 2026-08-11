@@ -1,0 +1,49 @@
+﻿name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: pytest (${{ matrix.os }} py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.5.x"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Cache venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
+
+      - name: Create venv
+        run: uv venv --python ${{ matrix.python-version }} .venv
+
+      - name: Install dependencies
+        run: uv pip install --python .venv/bin/python -r requirements.txt pytest pytest-cov
+
+      - name: Run tests
+        run: .venv/bin/python -m pytest -q
+        shell: bash
