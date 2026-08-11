@@ -1,0 +1,6 @@
+numpy>=1.26,<3
+opencv-python>=4.10,<4.11
+pillow>=10,<13
+insightface>=0.7.3
+onnxruntime>=1.18,<2
+pyside6>=6.7,<7
