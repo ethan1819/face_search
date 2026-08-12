@@ -36,7 +36,7 @@ jobs:
             libxcb-xkb1 libfontconfig1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           version: "0.5.x"
 
