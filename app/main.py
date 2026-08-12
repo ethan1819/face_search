@@ -327,10 +327,20 @@ class MainWindow(QMainWindow):
             self._start_thumb_thread(hits)
 
     def _drain_thumb_thread(self) -> None:
-        if self.thumb_thread is not None:
-            if self.thumb_thread.isRunning():
-                self.thumb_thread.quit()
-                self.thumb_thread.wait(2000)
+        thread = self.thumb_thread
+        if thread is not None:
+            # MUST disconnect before wait(): the old thread's finished signal
+            # is queued onto the main thread; if we do not disconnect,
+            # _on_thumb_finished runs after _start_thumb_thread has already
+            # stored the new thread in self.thumb_thread, and the slot then
+            # nulls the new reference -- causing use-after-free in Qt cleanup.
+            try:
+                thread.finished.disconnect(self._on_thumb_finished)
+            except (RuntimeError, TypeError):
+                pass
+            if thread.isRunning():
+                thread.quit()
+                thread.wait(2000)
             self.thumb_thread = None
         self.thumb_worker = None
 
