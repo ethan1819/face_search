@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "numpy>=1.26,<3",
-  "opencv-python>=4.10,<4.11",
+  "opencv-python>=4.10,<5.1",
   "pillow>=10,<13",
   "insightface>=0.7.3",
   "onnxruntime>=1.18,<2",
